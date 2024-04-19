@@ -1,47 +1,61 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
   <main>
-    <TheWelcome />
+    <CardList v-for="(item, index) in CardListOptions" :key="index" :options="item" />
   </main>
 </template>
 
+<script setup>
+import { ref, provide } from 'vue';
+import axios from 'axios';
+import CardList from './components/CardList.vue';
+
+const firstList = ref([]);
+const secondList = ref([]);
+const lastList = ref([]);
+
+const CardListOptions = ref([
+  {
+    color: '#0aa6e362',
+    title: 'Необработанные',
+    id: 1,
+  },
+  {
+    color: '#e86405bd',
+    title: 'В работе',
+    id: 2,
+  },
+  {
+    color: '#9400d364',
+    title: 'Завершенные',
+    id: 3,
+  },
+]);
+
+const getAllCards = async () => {
+  try {
+    await axios
+        .get('https://fakestoreapi.com/products')
+        .then((res) => (firstList.value = res.data));
+    console.log('getAllCards - успешно');
+  } catch (error) {
+    console.log(error);
+    alert('Упс! Ошибка получения данных ;(');
+  }
+};
+
+getAllCards();
+
+provide('firstList', firstList);
+provide('secondList', secondList);
+provide('lastList', lastList);
+</script>
+
 <style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+main {
+  margin: 5% 0;
+  display: flex;
+  justify-content: center;
+  gap: 5%;
+  width: 100%;
 }
 </style>
